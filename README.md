@@ -1,7 +1,7 @@
 # GeoKit
 
 <p align="center">
-  <img src="./assets/icon.png" alt="GeoKit icon" width="120" />
+  <img src="./assets/icon.png" alt="GeoKit icon" width="100%" />
 </p>
 
 ---
