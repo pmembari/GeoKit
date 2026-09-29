@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 
 export function getHtmlForWebview(context: vscode.ExtensionContext, webview: vscode.Webview): string {
+    const hostScriptUri = webview.asWebviewUri(vscode.Uri.joinPath(context.extensionUri, "media", "vscode-host.js"));
     const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(context.extensionUri, "media", "viewer.js"));
     const styleUri = webview.asWebviewUri(vscode.Uri.joinPath(context.extensionUri, "media", "viewer.css"));
     const nonce = getNonce();
@@ -93,6 +94,7 @@ export function getHtmlForWebview(context: vscode.ExtensionContext, webview: vsc
         </div>
     </div>
     <div id="error-message" style="display: none;"></div>
+    <script nonce="${nonce}" src="${hostScriptUri}"></script>
     <script nonce="${nonce}" src="${scriptUri}"></script>
 </body>
 </html>`;
