@@ -842,6 +842,10 @@
         }
     });
 
+    // Signal only after the viewer has registered its host message listener.
+    // This prevents the initial load message from being lost during webview startup.
+    host.postMessage({ type: 'ready' });
+
     // Set initial cursor
     container.style.cursor = 'grab';
 })();
