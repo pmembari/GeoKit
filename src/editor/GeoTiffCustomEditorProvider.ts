@@ -2,16 +2,12 @@ import * as vscode from "vscode";
 import { parseGeoTiff } from "./geoTiffParser";
 import { buildStatusContent } from "./status";
 import { getHtmlForWebview } from "./webviewHtml";
-import type { ParsedGeoTiff, ViewerLoadData } from "../types";
+import { createViewerLoadData } from "../viewer/createViewerLoadData";
+import type { ViewerToHostMessage } from "../viewer/protocol";
 
 interface GeoTiffCustomDocument extends vscode.CustomDocument {
     readonly uri: vscode.Uri;
 }
-
-type WebviewMessage =
-    | { type: "changeColormap"; colormap: string }
-    | { type: "getPixelValue" }
-    | { type: "exportPng"; data: number[] };
 
 export class GeoTiffCustomEditorProvider implements vscode.CustomReadonlyEditorProvider<GeoTiffCustomDocument> {
     public static readonly viewType = "geotiffViewer.raster";
@@ -49,41 +45,58 @@ export class GeoTiffCustomEditorProvider implements vscode.CustomReadonlyEditorP
         webviewPanel.webview.options = {
             enableScripts: true,
         };
-        webviewPanel.webview.html = getHtmlForWebview(this.context, webviewPanel.webview);
 
         let statusText = "";
         let statusTooltip: vscode.MarkdownString | undefined;
+        let loadStarted = false;
 
-        try {
-            const bytes = await vscode.workspace.fs.readFile(document.uri);
-            const parsed = await parseGeoTiff(bytes);
-            const status = buildStatusContent(parsed);
-            statusText = status.text;
-            statusTooltip = status.tooltip;
-
-            if (webviewPanel.active) {
-                this.applyStatusBar(statusText, statusTooltip);
+        const loadDocument = async (): Promise<void> => {
+            if (loadStarted) {
+                return;
             }
+            loadStarted = true;
 
-            const settings = vscode.workspace.getConfiguration("geotiffViewer");
-            const colormap = settings.get<string>("defaultColormap") ?? "viridis";
-            const stretchPercent = settings.get<number>("stretchPercent") ?? 2;
+            try {
+                const bytes = await vscode.workspace.fs.readFile(document.uri);
+                const parsed = await parseGeoTiff(bytes);
+                const status = buildStatusContent(parsed);
+                statusText = status.text;
+                statusTooltip = status.tooltip;
 
-            await webviewPanel.webview.postMessage({
-                type: "load",
-                data: this.toViewerLoadData(parsed, document.uri, colormap, stretchPercent),
-            });
-        } catch (error) {
-            const message = error instanceof Error ? error.message : "Unknown error";
-            await webviewPanel.webview.postMessage({
-                type: "error",
-                message: `Failed to load GeoTIFF: ${message}`,
-            });
-            void vscode.window.showErrorMessage(`Failed to load GeoTIFF: ${message}`);
-        }
+                if (webviewPanel.active) {
+                    this.applyStatusBar(statusText, statusTooltip);
+                }
 
-        webviewPanel.webview.onDidReceiveMessage(async (message: WebviewMessage) => {
+                const settings = vscode.workspace.getConfiguration("geotiffViewer");
+                const colormap = settings.get<string>("defaultColormap") ?? "viridis";
+                const stretchPercent = settings.get<number>("stretchPercent") ?? 2;
+
+                await webviewPanel.webview.postMessage({
+                    type: "load",
+                    data: createViewerLoadData(
+                        parsed,
+                        document.uri.fsPath.split(/[\\/]/).pop() ?? document.uri.fsPath,
+                        colormap,
+                        stretchPercent,
+                    ),
+                });
+            } catch (error) {
+                const message = error instanceof Error ? error.message : "Unknown error";
+                await webviewPanel.webview.postMessage({
+                    type: "error",
+                    message: `Failed to load GeoTIFF: ${message}`,
+                });
+                void vscode.window.showErrorMessage(`Failed to load GeoTIFF: ${message}`);
+            }
+        };
+
+        // Register the host listener before loading the webview HTML. The viewer
+        // sends "ready" only after its own inbound message listener is attached.
+        webviewPanel.webview.onDidReceiveMessage(async (message: ViewerToHostMessage) => {
             switch (message.type) {
+                case "ready":
+                    await loadDocument();
+                    break;
                 case "changeColormap":
                 case "getPixelValue":
                     break;
@@ -92,6 +105,8 @@ export class GeoTiffCustomEditorProvider implements vscode.CustomReadonlyEditorP
                     break;
             }
         });
+
+        webviewPanel.webview.html = getHtmlForWebview(this.context, webviewPanel.webview);
 
         webviewPanel.onDidChangeViewState(() => {
             if (webviewPanel.visible && statusTooltip) {
@@ -104,34 +119,6 @@ export class GeoTiffCustomEditorProvider implements vscode.CustomReadonlyEditorP
         webviewPanel.onDidDispose(() => {
             GeoTiffCustomEditorProvider.statusInfo.hide();
         });
-    }
-
-    private toViewerLoadData(
-        parsed: ParsedGeoTiff,
-        uri: vscode.Uri,
-        colormap: string,
-        stretchPercent: number,
-    ): ViewerLoadData {
-        return {
-            width: parsed.width,
-            height: parsed.height,
-            bandCount: parsed.bandCount,
-            allBands: parsed.allBands.map((band) => Array.from(band)),
-            bandMins: parsed.bandMins,
-            bandMaxes: parsed.bandMaxes,
-            noDataValue: parsed.noDataValue,
-            colormap,
-            stretchPercent,
-            metadata: {
-                crs: parsed.crs,
-                bounds: parsed.bounds,
-                compression: parsed.compression,
-                dtype: parsed.dtype,
-                filename: uri.fsPath.split(/[\\/]/).pop() ?? uri.fsPath,
-                fileDirectory: parsed.fileDirectory,
-                geoKeys: parsed.geoKeys,
-            },
-        };
     }
 
     private async exportPng(sourceUri: vscode.Uri, data: number[]): Promise<void> {

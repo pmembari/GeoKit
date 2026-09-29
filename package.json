@@ -8,6 +8,7 @@
 	"icon": "assets/icon.png",
 	"files": [
 		"out/extension.js",
+		"media/vscode-host.js",
 		"media/viewer.js",
 		"media/viewer.css",
 		"assets/icon.png",
@@ -86,7 +87,7 @@
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run build",
-		"build": "node esbuild.config.mjs && node --check media/viewer.js",
+		"build": "node esbuild.config.mjs && node --check media/vscode-host.js && node --check media/viewer.js",
 		"compile": "npm run build",
 		"typecheck": "tsc --noEmit",
 		"package": "vsce package --no-dependencies --no-yarn"

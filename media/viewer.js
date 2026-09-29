@@ -1,7 +1,9 @@
 // @ts-check
 (function () {
-    // @ts-ignore
-    const vscode = acquireVsCodeApi();
+    const host = window.GeoKitHost;
+    if (!host) {
+        throw new Error("GeoKit host adapter is not available");
+    }
 
     const DEBUG = false;
     function debugLog(/** @type {any[]} */ ...args) {
@@ -620,7 +622,7 @@
     colormapSelect.addEventListener('change', (e) => {
         currentColormap = e.target.value;
         render();
-        vscode.postMessage({ type: 'changeColormap', colormap: currentColormap });
+        host.postMessage({ type: 'changeColormap', colormap: currentColormap });
     });
 
     resetZoomBtn.addEventListener('click', resetView);
@@ -631,7 +633,7 @@
     exportPngBtn.addEventListener('click', () => {
         canvas.toBlob(blob => {
             blob.arrayBuffer().then(buffer => {
-                vscode.postMessage({ type: 'exportPng', data: Array.from(new Uint8Array(buffer)) });
+                host.postMessage({ type: 'exportPng', data: Array.from(new Uint8Array(buffer)) });
             });
         }, 'image/png');
     });
@@ -765,9 +767,8 @@
         render();
     });
 
-    // Handle messages from extension
-    window.addEventListener('message', (event) => {
-        const message = event.data;
+    // Handle messages from the host adapter.
+    host.onMessage((message) => {
         debugLog('Message received:', message.type);
 
         switch (message.type) {
@@ -840,6 +841,10 @@
                 break;
         }
     });
+
+    // Signal only after the viewer has registered its host message listener.
+    // This prevents the initial load message from being lost during webview startup.
+    host.postMessage({ type: 'ready' });
 
     // Set initial cursor
     container.style.cursor = 'grab';
