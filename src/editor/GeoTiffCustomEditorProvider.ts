@@ -2,16 +2,12 @@ import * as vscode from "vscode";
 import { parseGeoTiff } from "./geoTiffParser";
 import { buildStatusContent } from "./status";
 import { getHtmlForWebview } from "./webviewHtml";
-import type { ParsedGeoTiff, ViewerLoadData } from "../types";
+import { createViewerLoadData } from "../viewer/createViewerLoadData";
+import type { ViewerToHostMessage } from "../viewer/protocol";
 
 interface GeoTiffCustomDocument extends vscode.CustomDocument {
     readonly uri: vscode.Uri;
 }
-
-type WebviewMessage =
-    | { type: "changeColormap"; colormap: string }
-    | { type: "getPixelValue" }
-    | { type: "exportPng"; data: number[] };
 
 export class GeoTiffCustomEditorProvider implements vscode.CustomReadonlyEditorProvider<GeoTiffCustomDocument> {
     public static readonly viewType = "geotiffViewer.raster";
@@ -71,7 +67,12 @@ export class GeoTiffCustomEditorProvider implements vscode.CustomReadonlyEditorP
 
             await webviewPanel.webview.postMessage({
                 type: "load",
-                data: this.toViewerLoadData(parsed, document.uri, colormap, stretchPercent),
+                data: createViewerLoadData(
+                    parsed,
+                    document.uri.fsPath.split(/[\\\\/]/).pop() ?? document.uri.fsPath,
+                    colormap,
+                    stretchPercent,
+                ),
             });
         } catch (error) {
             const message = error instanceof Error ? error.message : "Unknown error";
@@ -82,7 +83,7 @@ export class GeoTiffCustomEditorProvider implements vscode.CustomReadonlyEditorP
             void vscode.window.showErrorMessage(`Failed to load GeoTIFF: ${message}`);
         }
 
-        webviewPanel.webview.onDidReceiveMessage(async (message: WebviewMessage) => {
+        webviewPanel.webview.onDidReceiveMessage(async (message: ViewerToHostMessage) => {
             switch (message.type) {
                 case "changeColormap":
                 case "getPixelValue":
@@ -104,34 +105,6 @@ export class GeoTiffCustomEditorProvider implements vscode.CustomReadonlyEditorP
         webviewPanel.onDidDispose(() => {
             GeoTiffCustomEditorProvider.statusInfo.hide();
         });
-    }
-
-    private toViewerLoadData(
-        parsed: ParsedGeoTiff,
-        uri: vscode.Uri,
-        colormap: string,
-        stretchPercent: number,
-    ): ViewerLoadData {
-        return {
-            width: parsed.width,
-            height: parsed.height,
-            bandCount: parsed.bandCount,
-            allBands: parsed.allBands.map((band) => Array.from(band)),
-            bandMins: parsed.bandMins,
-            bandMaxes: parsed.bandMaxes,
-            noDataValue: parsed.noDataValue,
-            colormap,
-            stretchPercent,
-            metadata: {
-                crs: parsed.crs,
-                bounds: parsed.bounds,
-                compression: parsed.compression,
-                dtype: parsed.dtype,
-                filename: uri.fsPath.split(/[\\/]/).pop() ?? uri.fsPath,
-                fileDirectory: parsed.fileDirectory,
-                geoKeys: parsed.geoKeys,
-            },
-        };
     }
 
     private async exportPng(sourceUri: vscode.Uri, data: number[]): Promise<void> {
