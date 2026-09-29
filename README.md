@@ -2,7 +2,7 @@
 
 A VS Code extension for viewing GeoTIFF raster files directly in the editor. Supports LZW, DEFLATE, ZSTD, and other common compressions used in satellite imagery and remote sensing data.
 
-![GeoTIFF Viewer screenshot](https://github.com/adh1b/geotiff-viewer/raw/HEAD/assets/screenshot.png)
+![GeoTIFF Viewer screenshot](https://github.com/pmembari/GeoKit/raw/HEAD/assets/screenshot.png)
 
 ## Features
 
@@ -33,23 +33,23 @@ A VS Code extension for viewing GeoTIFF raster files directly in the editor. Sup
 
 ### From GitHub Releases
 
-1. Download `geotiff-viewer-0.2.0.vsix` from the [latest release](https://github.com/adh1b/geotiff-viewer/releases/latest)
+1. Download `GeoKit-0.2.0.vsix` from the [latest release](https://github.com/pmembari/GeoKit/releases/latest)
 2. In VS Code, open the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`)
 3. Run **Extensions: Install from VSIX...** and select the downloaded file
 
 Or via the terminal:
 ```bash
-code --install-extension geotiff-viewer-0.2.0.vsix
+code --install-extension GeoKit-0.2.0.vsix
 ```
 
 ### From Source
 
 ```bash
-git clone https://github.com/adh1b/geotiff-viewer
-cd geotiff-viewer
+git clone https://github.com/pmembari/GeoKit
+cd GeoKit
 npm install
 npm run package
-code --install-extension geotiff-viewer-0.2.0.vsix
+code --install-extension GeoKit-0.2.0.vsix
 ```
 
 ## Usage

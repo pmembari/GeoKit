@@ -1,5 +1,5 @@
 {
-	"name": "geotiff-viewer",
+	"name": "GeoKit",
 	"displayName": "GeoTIFF Viewer (Community)",
 	"description": "View GeoTIFF raster files with support for LZW, DEFLATE, and other compressions",
 	"version": "0.2.0",
@@ -7,7 +7,7 @@
 	"icon": "assets/icon.png",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/adh1b/geotiff-viewer"
+		"url": "https://github.com/pmembari/GeoKit"
 	},
 	"engines": {
 		"vscode": "^1.80.0"

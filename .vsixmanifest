@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 	<PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
 		<Metadata>
-			<Identity Language="en-US" Id="geotiff-viewer" Version="0.2.0" Publisher="adh1b" />
+			<Identity Language="en-US" Id="GeoKit" Version="0.2.0" Publisher="pmembari" />
 			<DisplayName>GeoTIFF Viewer</DisplayName>
 			<Description xml:space="preserve">View GeoTIFF raster files with support for LZW, DEFLATE, and other compressions</Description>
 			<Tags>geotiff,tiff,raster,remote sensing,satellite,ECOSTRESS,COG</Tags>
@@ -18,11 +18,11 @@
 				
 				<Property Id="Microsoft.VisualStudio.Code.ExecutesCode" Value="true" />
 				
-				<Property Id="Microsoft.VisualStudio.Services.Links.Source" Value="https://github.com/adh1b/geotiff-viewer.git" />
-				<Property Id="Microsoft.VisualStudio.Services.Links.Getstarted" Value="https://github.com/adh1b/geotiff-viewer.git" />
-				<Property Id="Microsoft.VisualStudio.Services.Links.GitHub" Value="https://github.com/adh1b/geotiff-viewer.git" />
-				<Property Id="Microsoft.VisualStudio.Services.Links.Support" Value="https://github.com/adh1b/geotiff-viewer/issues" />
-				<Property Id="Microsoft.VisualStudio.Services.Links.Learn" Value="https://github.com/adh1b/geotiff-viewer#readme" />
+				<Property Id="Microsoft.VisualStudio.Services.Links.Source" Value="https://github.com/pmembari/GeoKit.git" />
+				<Property Id="Microsoft.VisualStudio.Services.Links.Getstarted" Value="https://github.com/pmembari/GeoKit.git" />
+				<Property Id="Microsoft.VisualStudio.Services.Links.GitHub" Value="https://github.com/pmembari/GeoKit.git" />
+				<Property Id="Microsoft.VisualStudio.Services.Links.Support" Value="https://github.com/pmembari/GeoKit/issues" />
+				<Property Id="Microsoft.VisualStudio.Services.Links.Learn" Value="https://github.com/pmembari/GeoKit#readme" />
 				
 				
 				<Property Id="Microsoft.VisualStudio.Services.GitHubFlavoredMarkdown" Value="true" />
