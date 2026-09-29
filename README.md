@@ -14,6 +14,14 @@
 
 ---
 
+## GeoKit in action
+
+<video src="assets/demo.webm" width="900" controls muted loop>
+  Your browser does not support the video element.
+</video>
+
+Open GeoTIFFs directly in VS Code, inspect raster values, switch bands, create RGB composites, and explore metadata without leaving your development environment.
+
 ## Overview
 
 GeoKit is an open-source geospatial toolkit designed to bring common raster exploration workflows closer to developers.
@@ -194,6 +202,8 @@ GeoKit/
 │   ├── viewer.css
 │   └── vscode-host.js  # VS Code-specific webview adapter
 ├── assets/
+│   ├── demo.webm
+│   └── icon.png
 ├── esbuild.config.mjs
 ├── package.json
 └── tsconfig.json
