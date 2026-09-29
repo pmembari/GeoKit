@@ -1,86 +1,260 @@
-# GeoTIFF Viewer for VS Code
+# GeoKit
 
-A VS Code extension for viewing GeoTIFF raster files directly in the editor. Supports LZW, DEFLATE, ZSTD, and other common compressions used in satellite imagery and remote sensing data.
+<p align="center">
+  <img src="assets/icon.png" alt="GeoKit icon" width="120" />
+</p>
 
-![GeoTIFF Viewer screenshot](https://github.com/pmembari/GeoKit/raw/HEAD/assets/screenshot.png)
+<p align="center">
+  A lightweight geospatial workspace for viewing and inspecting raster data directly inside developer tools.
+</p>
 
-## Features
+<p align="center">
+  <strong>Current focus:</strong> fast, browser-based GeoTIFF visualization in VS Code without requiring Python or GDAL.
+</p>
 
-- **Full compression support**: LZW, DEFLATE, ZSTD, PackBits, JPEG, and more
-- **Data type support**: Float32, Float64, Int8/16/32, UInt8/16/32
-- **Eight colormaps**: Viridis, Plasma, Inferno, Magma, Jet, Terrain, Grayscale, Cool-Warm
-- **Interactive viewing**: scroll to zoom, drag to pan, fit to screen on load
-- **Multi-band support**: band selector dropdown; RGB composite mode with per-channel percentile stretch
-- Automatic 2% percentile histogram stretch with manual Min/Max override inputs
-- Histogram panel with current stretch range markers
-- **Statistics panel**: min, max, mean, median, std dev, valid pixel count, NoData coverage %
-- **Metadata inspector**: collapsible panel showing all TIFF file directory tags and GeoKeys
-- Pixel value and geographic coordinate display on hover
-- Ground resolution in the status bar tooltip (m/px or °/px)
-- **Export current view as PNG**
-- COG overview loading: reads from the appropriate pre-built overview pyramid for fast display of large files
-- Status bar showing dimensions, data type, CRS, and compression for the active file
-- NoData pixels rendered as transparent
+---
 
-## Supported Formats
+## Overview
 
-- `.tif`, `.tiff`, `.geotiff` files
-- Cloud Optimized GeoTIFFs (COGs)
-- Standard GeoTIFF with embedded georeferencing
-- Single-band and multi-band rasters (e.g., ECOSTRESS LST, DEMs, Landsat, Sentinel-2)
+GeoKit is an open-source geospatial toolkit designed to bring common raster exploration workflows closer to developers.
+
+The project currently provides a VS Code custom editor for GeoTIFF files. The viewer runs in the webview and uses `geotiff.js` for raster decoding, keeping the normal visualization path lightweight and independent of Python.
+
+GeoKit is being developed toward a broader shared viewer architecture that can later be reused across environments such as VS Code, code-server, and JupyterLab.
+
+## Current capabilities
+
+GeoKit currently supports:
+
+- GeoTIFF files with `.tif`, `.tiff`, and `.geotiff` extensions
+- Cloud Optimized GeoTIFFs with embedded overview pyramids
+- single-band and multi-band rasters
+- RGB composites with selectable R, G, and B bands
+- LZW, DEFLATE, ZSTD, PackBits, JPEG, and uncompressed TIFF data supported through `geotiff.js`
+- integer and floating-point raster data types
+- eight colormaps: Viridis, Plasma, Inferno, Magma, Grayscale, Jet, Terrain, and Cool-Warm
+- automatic percentile stretch with manual Min/Max overrides
+- interactive zoom, pan, fit-to-view, and reset controls
+- pixel values and geographic coordinates on hover
+- histogram and statistics inspection
+- TIFF tags and GeoKeys metadata inspection
+- NoData transparency and coverage reporting
+- dimensions, data type, CRS, compression, and resolution in the VS Code status bar
+- export of the current rendered view as PNG
+
+For large rasters, GeoKit limits the display workload and uses an available GeoTIFF overview when possible rather than rendering the full-resolution raster directly.
+
+## Architecture
+
+The current architecture keeps the raster viewer independent from the VS Code API:
+
+```text
+VS Code extension
+    │
+    ├── file access
+    ├── settings
+    ├── status bar
+    ├── PNG export
+    │
+    └── VS Code host adapter
+            │
+            ▼
+      shared browser viewer
+            │
+            ▼
+        geotiff.js
+```
+
+The browser viewer does not call `acquireVsCodeApi()` directly. Host communication is isolated behind a small adapter and message protocol.
+
+This separation is intended to make the same viewer reusable in future environments instead of maintaining separate visualization implementations.
 
 ## Installation
 
-### From GitHub Releases
+### Install from a VSIX
 
-1. Download `GeoKit-0.2.0.vsix` from the [latest release](https://github.com/pmembari/GeoKit/releases/latest)
-2. In VS Code, open the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`)
-3. Run **Extensions: Install from VSIX...** and select the downloaded file
+Download a GeoKit VSIX from the project releases, then install it from VS Code:
 
-Or via the terminal:
+1. Open the Command Palette with `Ctrl+Shift+P` or `Cmd+Shift+P`.
+2. Select **Extensions: Install from VSIX...**
+3. Choose the downloaded `.vsix` file.
+
+You can also install it from the terminal:
+
 ```bash
-code --install-extension GeoKit-0.2.0.vsix
+code --install-extension geokit-0.2.0.vsix
 ```
 
-### From Source
+### Build from source
 
 ```bash
-git clone https://github.com/pmembari/GeoKit
+git clone https://github.com/pmembari/GeoKit.git
 cd GeoKit
-npm install
+
+npm ci
+npm run typecheck
+npm run build
 npm run package
-code --install-extension GeoKit-0.2.0.vsix
+
+code --install-extension geokit-0.2.0.vsix
 ```
 
 ## Usage
 
-1. Open any `.tif`, `.tiff`, or `.geotiff` file in VS Code
-2. The GeoTIFF Viewer opens automatically
-3. **Scroll** to zoom in/out; **drag** to pan; click **Reset View** to fit the image
-4. Switch bands via the **Band** dropdown; enable **RGB Composite** mode for multi-band files
-5. **Hover** over the image to see pixel values and geographic coordinates
-6. Expand the **Metadata** or **Statistics** panels by clicking their headers
-7. Click **Export PNG** to save the current view
+Open any supported GeoTIFF file in VS Code. GeoKit is registered as the default custom editor for:
 
-## Known Limitations
+```text
+*.tif
+*.tiff
+*.geotiff
+```
 
-- Read-only (no editing capability)
-- Very large non-COG files (>500 MB without embedded overview pyramids) may be slow to load
+Inside the viewer you can switch between single-band and RGB rendering, choose bands and colormaps, adjust the display stretch, inspect metadata and statistics, zoom or pan through the raster, inspect pixel values, and export the current visualization as a PNG.
+
+## Settings
+
+GeoKit currently exposes two VS Code settings.
+
+### Default colormap
+
+```text
+geotiffViewer.defaultColormap
+```
+
+Default: `viridis`
+
+Available values:
+
+```text
+viridis
+plasma
+inferno
+magma
+grayscale
+jet
+terrain
+coolwarm
+```
+
+### Histogram stretch
+
+```text
+geotiffViewer.stretchPercent
+```
+
+Default: `2`
+
+This defines the percentage clipped from both ends of the value distribution for the automatic raster stretch. The accepted range is 0–10.
 
 ## Development
 
-```bash
-# Watch mode for development
-npm run watch
+Requirements:
 
-# Open VS Code with extension loaded
-# Press F5 in VS Code to launch Extension Development Host
+- Node.js
+- npm
+- VS Code
+
+Install dependencies:
+
+```bash
+npm ci
+```
+
+Validate the TypeScript source:
+
+```bash
+npm run typecheck
+```
+
+Build the extension:
+
+```bash
+npm run build
+```
+
+Package a VSIX:
+
+```bash
+npm run package
+```
+
+The extension host is bundled with esbuild into `out/extension.js`. The browser viewer remains under `media/`.
+
+### Source layout
+
+```text
+GeoKit/
+├── src/
+│   ├── editor/         # VS Code custom editor integration
+│   ├── viewer/         # host-neutral viewer protocol and data mapping
+│   ├── extension.ts    # VS Code extension entry point
+│   └── types.ts
+├── media/
+│   ├── viewer.js       # browser raster viewer
+│   ├── viewer.css
+│   └── vscode-host.js  # VS Code-specific webview adapter
+├── assets/
+├── esbuild.config.mjs
+├── package.json
+└── tsconfig.json
+```
+
+## Roadmap
+
+GeoKit is intended to grow beyond a standalone GeoTIFF viewer while keeping the normal visualization path browser-native.
+
+Planned areas include:
+
+- improved large-raster performance with workers and reduced data copying
+- code-server validation
+- JupyterLab integration using the same shared viewer
+- STAC catalog and item browsing
+- GeoJSON and vector visualization
+- Shapefile and GeoPackage workflows
+- raster and vector layer abstractions
+- optional Python/GDAL processing for heavier operations such as VRT creation, clipping, reprojection, mosaicking, compositing, and raster calculations
+
+These items are roadmap goals and are **not part of the current released feature set**.
+
+## Design goals
+
+GeoKit prioritizes:
+
+1. fast startup
+2. responsive interactive visualization
+3. bounded memory usage
+4. a small runtime dependency footprint
+5. portability across developer environments
+6. maintainable shared geospatial components
+
+The project is not intended to replace QGIS. Its goal is to provide common geospatial inspection and lightweight processing workflows directly where developers already work.
+
+## Current limitations
+
+- GeoKit is currently read-only.
+- The current extension focuses on raster visualization.
+- Very large non-COG files without overview pyramids can still require significant loading and decoding work.
+- STAC, vector data, JupyterLab support, and GDAL-backed processing are not yet implemented.
+
+## Contributing
+
+Issues and pull requests are welcome.
+
+When contributing, please keep the viewer layer independent from editor-specific APIs where practical. VS Code-specific behavior should remain in the host adapter or extension integration layer rather than being introduced directly into shared viewer code.
+
+Before submitting changes, run:
+
+```bash
+npm ci
+npm run typecheck
+npm run build
+npm run package
 ```
 
 ## License
 
-MIT
+GeoKit is released under the MIT License.
 
-## Credits
+## Acknowledgements
 
-Uses [geotiff.js](https://github.com/geotiffjs/geotiff.js) for TIFF parsing.
+GeoKit uses [geotiff.js](https://github.com/geotiffjs/geotiff.js) for GeoTIFF parsing and raster decoding.
