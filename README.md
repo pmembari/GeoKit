@@ -1,15 +1,7 @@
 # GeoKit
 
 <p align="center">
-  <img src="assets/geokit-logo.png" alt="GeoKit" width="140" />
-</p>
-
-<p align="center">
-  <strong>A lightweight geospatial workspace for developers.</strong>
-</p>
-
-<p align="center">
-  Explore and visualize geospatial data directly inside your development environment.
+  <img src="./assets/icon.png" alt="GeoKit icon" width="120" />
 </p>
 
 ---
