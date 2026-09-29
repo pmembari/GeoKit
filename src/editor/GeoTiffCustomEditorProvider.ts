@@ -69,7 +69,7 @@ export class GeoTiffCustomEditorProvider implements vscode.CustomReadonlyEditorP
                 type: "load",
                 data: createViewerLoadData(
                     parsed,
-                    document.uri.fsPath.split(/[\\\\/]/).pop() ?? document.uri.fsPath,
+                    document.uri.fsPath.split(/[\\/]/).pop() ?? document.uri.fsPath,
                     colormap,
                     stretchPercent,
                 ),
