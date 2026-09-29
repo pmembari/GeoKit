@@ -16,9 +16,11 @@
 
 ## GeoKit in action
 
-<video src="assets/demo.webm" width="100%" controls muted loop>
-  Your browser does not support the video element.
-</video>
+<p align="center">
+  <img src="assets/demo.gif"
+       alt="GeoKit demo"
+       width="900" />
+</p>
 
 Open GeoTIFFs directly in VS Code, inspect raster values, switch bands, create RGB composites, and explore metadata without leaving your development environment.
 
