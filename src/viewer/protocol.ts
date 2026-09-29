@@ -1,6 +1,7 @@
 import type { ViewerLoadData } from "../types";
 
 export type ViewerToHostMessage =
+    | { type: "ready" }
     | { type: "changeColormap"; colormap: string }
     | { type: "getPixelValue" }
     | { type: "exportPng"; data: number[] };
