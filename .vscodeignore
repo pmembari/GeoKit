@@ -1,0 +1,14 @@
+src/**
+*.vsix
+*.tif
+*.tiff
+*.geotiff
+tsconfig.json
+esbuild.config.mjs
+package-lock.json
+node_modules/**
+out/**/*.map
+.git/**
+.gitignore
+.vscodeignore
+.vsixmanifest
