@@ -1,8 +1,8 @@
 {
 	"name": "geokit",
-	"displayName": "GeoKit (Community)",
+	"displayName": "GeoKit",
 	"description": "View GeoTIFF raster files with support for LZW, DEFLATE, and other compressions",
-	"version": "0.2.0",
+	"version": "0.1.0",
 	"publisher": "pmembari",
 	"license": "MIT",
 	"icon": "assets/icon.png",
@@ -42,7 +42,7 @@
 		"customEditors": [
 			{
 				"viewType": "geotiffViewer.raster",
-				"displayName": "GeoKit (Community)",
+				"displayName": "GeoKit",
 				"selector": [
 					{
 						"filenamePattern": "*.tif"
@@ -58,7 +58,7 @@
 			}
 		],
 		"configuration": {
-			"title": "GeoKit (Community)",
+			"title": "GeoKit",
 			"properties": {
 				"geotiffViewer.defaultColormap": {
 					"type": "string",
@@ -90,7 +90,8 @@
 		"build": "node esbuild.config.mjs && node --check media/vscode-host.js && node --check media/viewer.js",
 		"compile": "npm run build",
 		"typecheck": "tsc --noEmit",
-		"package": "vsce package --no-dependencies --no-yarn"
+		"package": "vsce package --no-dependencies --no-yarn",
+		"publish": "vsce publish --no-dependencies --no-yarn"
 	},
 	"dependencies": {
 		"geotiff": "^2.1.3"
