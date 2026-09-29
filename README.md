@@ -1,8 +1,26 @@
 # GeoKit
 
 <p align="center">
-  <img src="./assets/icon.png" alt="GeoKit icon" width="10%" />
+  <img src="assets/icon.png" alt="GeoKit icon" width="120" />
 </p>
+
+<p align="center">
+  A lightweight geospatial workspace for viewing and inspecting raster data directly inside developer tools.
+</p>
+
+<p align="center">
+  <strong>Current focus:</strong> fast, browser-based GeoTIFF visualization in VS Code without requiring Python or GDAL.
+</p>
+
+---
+
+## GeoKit in action
+
+<video src="assets/demo.webm" width="100%" controls muted loop>
+  Your browser does not support the video element.
+</video>
+
+Open GeoTIFFs directly in VS Code, inspect raster values, switch bands, create RGB composites, and explore metadata without leaving your development environment.
 
 ## Overview
 
@@ -184,6 +202,8 @@ GeoKit/
 │   ├── viewer.css
 │   └── vscode-host.js  # VS Code-specific webview adapter
 ├── assets/
+│   ├── demo.webm
+│   └── icon.png
 ├── esbuild.config.mjs
 ├── package.json
 └── tsconfig.json
