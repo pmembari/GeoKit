@@ -1,15 +1,15 @@
 # GeoKit
 
 <p align="center">
-  <img src="assets/icon.png" alt="GeoKit icon" width="120" />
+  <img src="assets/geokit-logo.png" alt="GeoKit" width="140" />
 </p>
 
 <p align="center">
-  A lightweight geospatial workspace for viewing and inspecting raster data directly inside developer tools.
+  <strong>A lightweight geospatial workspace for developers.</strong>
 </p>
 
 <p align="center">
-  <strong>Current focus:</strong> fast, browser-based GeoTIFF visualization in VS Code without requiring Python or GDAL.
+  Explore and visualize geospatial data directly inside your development environment.
 </p>
 
 ---
